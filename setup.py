@@ -15,6 +15,23 @@ setup(
     install_requires=[],
     extras_require={
         "pdf": ["pdfplumber>=0.10.0", "PyPDF2>=3.0.0"],
+        "ocr": [
+            "paddlepaddle>=2.5.0",
+            "paddleocr>=2.7.0",
+            "PyMuPDF>=1.23.0",
+        ],
+        "ocr-tesseract": [
+            "pytesseract>=0.3.10",
+            "Pillow>=10.0.0",
+            "PyMuPDF>=1.23.0",
+        ],
+        "all": [
+            "pdfplumber>=0.10.0",
+            "PyPDF2>=3.0.0",
+            "paddlepaddle>=2.5.0",
+            "paddleocr>=2.7.0",
+            "PyMuPDF>=1.23.0",
+        ],
         "dev": ["pytest>=7.0.0", "pytest-cov>=4.0.0"],
     },
     classifiers=[

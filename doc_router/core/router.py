@@ -9,9 +9,17 @@ from ..templates.fallback import FallbackTemplate
 class DocumentRouter:
     """文档结构路由器 - 主入口"""
 
-    def __init__(self, chunk_size: int = 800, chunk_overlap: int = 150):
+    def __init__(
+        self,
+        chunk_size: int = 800,
+        chunk_overlap: int = 150,
+        ocr_engine: str = "paddle",
+        ocr_lang: str = "ch",
+    ):
         self.chunk_size = chunk_size
         self.chunk_overlap = chunk_overlap
+        self.ocr_engine = ocr_engine
+        self.ocr_lang = ocr_lang
         self.matcher = TemplateMatcher()
         self._register_builtin_templates()
 
@@ -79,7 +87,18 @@ class DocumentRouter:
             return f.read()
 
     def _read_pdf(self, file_path: str) -> str:
-        """PDF读取（文本提取，非OCR）"""
+        """PDF读取（文本提取 + OCR回退）"""
+        # 1. 先尝试文本提取
+        text = self._extract_text_from_pdf(file_path)
+
+        # 2. 如果提取不到文本，尝试OCR
+        if not text or not text.strip():
+            text = self._ocr_pdf(file_path)
+
+        return text or ""
+
+    def _extract_text_from_pdf(self, file_path: str) -> str:
+        """从PDF提取文本（非OCR）"""
         try:
             import pdfplumber
             parts = []
@@ -90,13 +109,36 @@ class DocumentRouter:
                         parts.append(text)
             return "\n\n".join(parts)
         except ImportError:
-            try:
-                from PyPDF2 import PdfReader
-                reader = PdfReader(file_path)
-                parts = [page.extract_text() for page in reader.pages if page.extract_text()]
-                return "\n\n".join(parts)
-            except ImportError:
-                raise ImportError("需要安装 pdfplumber 或 PyPDF2 来读取PDF文件")
+            pass
+
+        try:
+            from PyPDF2 import PdfReader
+            reader = PdfReader(file_path)
+            parts = [page.extract_text() for page in reader.pages if page.extract_text()]
+            return "\n\n".join(parts)
+        except ImportError:
+            pass
+
+        return ""
+
+    def _ocr_pdf(self, file_path: str) -> str:
+        """使用OCR提取PDF文本"""
+        try:
+            from ..ocr import get_ocr_engine
+            engine = get_ocr_engine(
+                engine=self.ocr_engine,
+                lang=self.ocr_lang,
+            )
+            return engine.extract_text_from_pdf(file_path)
+        except ImportError as e:
+            raise ImportError(
+                f"PDF无可提取文本，需要安装OCR依赖进行文字识别。\n"
+                f"错误信息: {e}\n"
+                f"安装命令:\n"
+                f"  pip install paddlepaddle paddleocr PyMuPDF\n"
+                f"或使用自定义reader:\n"
+                f"  router.process_file('doc.pdf', reader=your_ocr_reader)"
+            )
 
     def get_info(self, text: str, source: str = "") -> TemplateInfo:
         """查看文档匹配信息（不切分）"""

@@ -33,3 +33,5 @@ Thumbs.db
 # Project specific
 *.pdf
 chroma_db/
+_temp_page_*.png
+test_ocr.png
