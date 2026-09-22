@@ -1,0 +1,33 @@
+# 词汇表型文档结构
+name: glossary
+description: 术语+解释格式的文档，如词典、手册
+
+detect_rules:
+  - type: term_definition
+    pattern: "^[A-Za-z\\u4e00-\\u9fa5]+[：:]"
+    weight: 0.4
+  - type: definition_format
+    keywords: ["定义", "解释", "含义", "概念"]
+    weight: 0.3
+  - type: consistent_structure
+    min_ratio: 0.6
+    weight: 0.2
+  - type: short_entries
+    avg_length: 100
+    weight: 0.1
+
+split_strategy:
+  method: by_entry
+  merge_entries: false
+  preserve_structure: true
+
+metadata_fields:
+  - term
+  - definition
+  - category
+  - related_terms
+
+examples:
+  - "医学术语词典"
+  - "计算机名词解释"
+  - "法律术语汇编"

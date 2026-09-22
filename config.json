@@ -1,0 +1,27 @@
+{
+  "llm": {
+    "provider": "ollama",
+    "model": "qwen2:7b",
+    "api_key": "",
+    "base_url": "http://localhost:11434/v1",
+    "temperature": 0.7,
+    "max_tokens": 4096,
+    "timeout": 60
+  },
+  "ocr": {
+    "engine": "paddle",
+    "lang": "ch",
+    "dpi": 200,
+    "use_gpu": false
+  },
+  "vector_db": {
+    "type": "chromadb",
+    "path": "./data/chroma_db",
+    "collection": "documents"
+  },
+  "analysis": {
+    "sample_pages": 50,
+    "chunk_size": 800,
+    "chunk_overlap": 150
+  }
+}

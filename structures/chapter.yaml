@@ -1,0 +1,34 @@
+# 章节型文档结构
+name: chapter
+description: 有章节编号的文档，如教材、技术文档
+
+detect_rules:
+  - type: chapter_number
+    patterns: ["第\\d+章", "Chapter\\s+\\d+", "\\d+\\.\\d+"]
+    weight: 0.4
+  - type: heading_hierarchy
+    min_levels: 2
+    weight: 0.3
+  - type: numbered_sections
+    patterns: ["\\d+\\.\\d+\\.?\\d*"]
+    weight: 0.2
+  - type: content_length
+    avg_chapter_length: 500
+    weight: 0.1
+
+split_strategy:
+  method: by_chapter
+  detect_chapters: true
+  fallback_to_heading: true
+
+metadata_fields:
+  - chapter_number
+  - chapter_title
+  - section
+  - page_start
+  - page_end
+
+examples:
+  - "大学计算机基础教程"
+  - "机器学习实战"
+  - "软件工程导论"

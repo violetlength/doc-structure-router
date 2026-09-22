@@ -1,0 +1,23 @@
+# 平面文档结构（无结构）
+name: plain
+description: 无明显结构的纯文本文档
+
+detect_rules:
+  - type: default
+    always_match: true
+    weight: 1.0
+
+split_strategy:
+  method: by_size
+  chunk_size: 800
+  chunk_overlap: 150
+
+metadata_fields:
+  - chunk_index
+  - page_start
+  - page_end
+
+examples:
+  - "纯文本笔记"
+  - "日志文件"
+  - "聊天记录"

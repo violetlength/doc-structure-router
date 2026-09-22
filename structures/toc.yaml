@@ -1,0 +1,34 @@
+# 目录型文档结构
+name: toc
+description: 有目录/书签的文档，如书籍、手册
+
+detect_rules:
+  - type: bookmark
+    required: false
+    weight: 0.4
+  - type: toc_keyword
+    keywords: ["目录", "目次", "Contents", "Table of Contents"]
+    weight: 0.3
+  - type: page_number_pattern
+    pattern: "[.…]{2,}\\d{1,4}$"
+    weight: 0.2
+  - type: structure_hierarchy
+    max_levels: 3
+    weight: 0.1
+
+split_strategy:
+  method: by_toc
+  extract_pages: true
+  merge_consecutive: true
+
+metadata_fields:
+  - chapter
+  - page_start
+  - page_end
+  - level
+  - parent_chapter
+
+examples:
+  - "DK家庭医生常见病诊疗手册"
+  - "Python编程从入门到实践"
+  - "数据结构与算法分析"

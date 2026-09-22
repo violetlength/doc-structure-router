@@ -1,0 +1,33 @@
+# 参考文档型结构
+name: reference
+description: 参考资料、API文档、规范文档
+
+detect_rules:
+  - type: api_endpoints
+    patterns: ["^(GET|POST|PUT|DELETE|PATCH)\\s+/"]
+    weight: 0.4
+  - type: code_blocks
+    min_ratio: 0.3
+    weight: 0.3
+  - type: parameter_lists
+    patterns: ["参数[：:]", "Parameters:", "Args:"]
+    weight: 0.2
+  - type: type_annotations
+    patterns: [":\\s*(string|int|bool|list|dict)"]
+    weight: 0.1
+
+split_strategy:
+  method: by_section
+  preserve_code: true
+  include_parameters: true
+
+metadata_fields:
+  - section_type
+  - api_endpoint
+  - parameters
+  - return_value
+
+examples:
+  - "FastAPI官方文档"
+  - "REST API参考手册"
+  - "SDK使用指南"

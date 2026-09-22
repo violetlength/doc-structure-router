@@ -1,0 +1,34 @@
+# 问答型文档结构
+name: qa
+description: 问题+答案格式的文档，如FAQ、考试题
+
+detect_rules:
+  - type: question_format
+    patterns: ["[？\\?]$", "^(什么|怎么|如何|为什么|哪些)"]
+    weight: 0.4
+  - type: answer_format
+    patterns: ["^(答|答案|解析|回答)"]
+    weight: 0.3
+  - type: q_a_separation
+    question_marker: "[？\\?]"
+    answer_marker: "^答"
+    weight: 0.2
+  - type: numbered_questions
+    patterns: ["^\\d+[.、]"]
+    weight: 0.1
+
+split_strategy:
+  method: by_qa
+  group_qa: true
+  preserve_context: true
+
+metadata_fields:
+  - question
+  - answer
+  - question_number
+  - category
+
+examples:
+  - "常见问题FAQ"
+  - "考试题库"
+  - "面试问答集"

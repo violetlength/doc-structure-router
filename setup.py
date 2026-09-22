@@ -13,27 +13,44 @@ setup(
     packages=find_packages(),
     python_requires=">=3.10",
     install_requires=[],
-    extras_require={
-        "pdf": ["pdfplumber>=0.10.0", "PyPDF2>=3.0.0"],
-        "ocr": [
-            "paddlepaddle>=2.5.0",
-            "paddleocr>=2.7.0",
-            "PyMuPDF>=1.23.0",
-        ],
-        "ocr-tesseract": [
-            "pytesseract>=0.3.10",
-            "Pillow>=10.0.0",
-            "PyMuPDF>=1.23.0",
-        ],
-        "all": [
-            "pdfplumber>=0.10.0",
-            "PyPDF2>=3.0.0",
-            "paddlepaddle>=2.5.0",
-            "paddleocr>=2.7.0",
-            "PyMuPDF>=1.23.0",
-        ],
-        "dev": ["pytest>=7.0.0", "pytest-cov>=4.0.0"],
-    },
+extras_require={
+    "pdf": ["pdfplumber>=0.10.0", "PyPDF2>=3.0.0"],
+    "ocr": [
+        "paddlepaddle>=2.5.0",
+        "paddleocr>=2.7.0",
+        "PyMuPDF>=1.23.0",
+    ],
+    "ocr-tesseract": [
+        "pytesseract>=0.3.10",
+        "Pillow>=10.0.0",
+        "PyMuPDF>=1.23.0",
+    ],
+    "llm": [
+        "httpx>=0.24.0",
+        "requests>=2.31.0",
+    ],
+    "vectorstore": [
+        "chromadb>=0.4.0",
+    ],
+    "web": [
+        "streamlit>=1.28.0",
+        "chromadb>=0.4.0",
+        "httpx>=0.24.0",
+        "requests>=2.31.0",
+    ],
+    "all": [
+        "pdfplumber>=0.10.0",
+        "PyPDF2>=3.0.0",
+        "paddlepaddle>=2.5.0",
+        "paddleocr>=2.7.0",
+        "PyMuPDF>=1.23.0",
+        "httpx>=0.24.0",
+        "requests>=2.31.0",
+        "chromadb>=0.4.0",
+        "streamlit>=1.28.0",
+    ],
+    "dev": ["pytest>=7.0.0", "pytest-cov>=4.0.0"],
+},
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
