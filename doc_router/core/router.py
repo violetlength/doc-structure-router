@@ -4,6 +4,7 @@ from typing import List, Optional
 from ..schemas.chunk import ChunkResult, TemplateInfo
 from ..core.matcher import TemplateMatcher
 from ..templates.fallback import FallbackTemplate
+from ..structure.detector import StructureDetector
 
 
 class DocumentRouter:
@@ -21,6 +22,7 @@ class DocumentRouter:
         self.ocr_engine = ocr_engine
         self.ocr_lang = ocr_lang
         self.matcher = TemplateMatcher()
+        self.structure_detector = StructureDetector()
         self._register_builtin_templates()
 
     def _register_builtin_templates(self):
@@ -29,8 +31,9 @@ class DocumentRouter:
         from ..templates.dictionary import DictionaryTemplate
         from ..templates.textbook import TextbookTemplate
         from ..templates.paper import PaperTemplate
+        from ..templates.toc_based import TOCBasedTemplate
 
-        for cls in [GuideTemplate, DictionaryTemplate, TextbookTemplate, PaperTemplate]:
+        for cls in [TOCBasedTemplate, GuideTemplate, DictionaryTemplate, TextbookTemplate, PaperTemplate]:
             self.matcher.register(cls(
                 chunk_size=self.chunk_size,
                 chunk_overlap=self.chunk_overlap,
@@ -45,8 +48,23 @@ class DocumentRouter:
         if not text or not text.strip():
             return []
 
+        # 合并元数据
+        features = (metadata or {}).copy()
+        
+        # 检测文档结构
+        structure = self.structure_detector.detect(text, features)
+        features["structure_type"] = structure.structure_type
+        features["structure"] = structure
+
+        # 获取PDF书签（如果有）
+        if source and source.lower().endswith(".pdf"):
+            bookmarks = self._get_pdf_bookmarks(source)
+            if bookmarks:
+                features["bookmarks"] = bookmarks
+                features["structure_type"] = "toc"
+
         file_ext = os.path.splitext(source)[1].lower() if source else ""
-        template = self.matcher.match(text, file_ext, metadata)
+        template = self.matcher.match(text, file_ext, features)
 
         if template is None:
             template = FallbackTemplate(
@@ -54,7 +72,7 @@ class DocumentRouter:
                 chunk_overlap=self.chunk_overlap,
             )
 
-        chunks = template.split(text, metadata)
+        chunks = template.split(text, features)
 
         for i, chunk in enumerate(chunks):
             chunk.source = source
@@ -156,3 +174,21 @@ class DocumentRouter:
             confidence=template.detect(text),
             detect_rules_matched=template.detect_keywords,
         )
+
+    def _get_pdf_bookmarks(self, file_path: str) -> list:
+        """获取PDF书签"""
+        try:
+            import pymupdf
+        except ImportError:
+            try:
+                import fitz as pymupdf
+            except ImportError:
+                return []
+        
+        try:
+            doc = pymupdf.open(file_path)
+            toc = doc.get_toc()
+            doc.close()
+            return toc
+        except Exception:
+            return []

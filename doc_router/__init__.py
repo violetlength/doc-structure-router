@@ -8,6 +8,7 @@ from .core.matcher import TemplateMatcher
 from .schemas.chunk import ChunkResult, TemplateInfo
 from .templates.base import BaseTemplate
 from .ocr import BaseOCREngine, get_ocr_engine
+from .structure import StructureDetector, DocumentStructure, TOCItem, HeadingNode
 
 __version__ = "0.1.0"
 __author__ = "doc-structure-router"
@@ -21,4 +22,8 @@ __all__ = [
     "BaseTemplate",
     "BaseOCREngine",
     "get_ocr_engine",
+    "StructureDetector",
+    "DocumentStructure",
+    "TOCItem",
+    "HeadingNode",
 ]

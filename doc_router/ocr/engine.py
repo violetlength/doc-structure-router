@@ -22,9 +22,10 @@ class PaddleOCREngine(BaseOCREngine):
     """PaddleOCR引擎"""
 
     def __init__(self, lang: str = "ch", use_gpu: bool = False, **kwargs):
+        from paddleocr import PaddleOCR
+        
+        # 尝试2.x API
         try:
-            from paddleocr import PaddleOCR
-            # 尝试2.x API
             self.ocr = PaddleOCR(use_angle_cls=True, lang=lang, use_gpu=use_gpu, show_log=False, **kwargs)
             self.version = 2
         except TypeError:
