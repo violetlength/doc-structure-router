@@ -4,6 +4,10 @@ import os
 import tempfile
 from pathlib import Path
 
+# 设置protobuf环境变量，解决PaddleOCR兼容性问题
+if "PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION" not in os.environ:
+    os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+
 # 添加项目根目录到路径
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))

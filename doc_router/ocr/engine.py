@@ -22,6 +22,10 @@ class PaddleOCREngine(BaseOCREngine):
     """PaddleOCR引擎"""
 
     def __init__(self, lang: str = "ch", use_gpu: bool = False, **kwargs):
+        # 设置protobuf环境变量，解决兼容性问题
+        if "PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION" not in os.environ:
+            os.environ["PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION"] = "python"
+        
         from paddleocr import PaddleOCR
         
         # 尝试2.x API
