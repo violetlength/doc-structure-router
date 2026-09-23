@@ -126,9 +126,9 @@ def render_upload():
             tmp_path = tmp.name
         
         try:
-            # OCR设置
-            st.subheader("OCR设置")
-            col1, col2 = st.columns(2)
+            # 处理设置
+            st.subheader("处理设置")
+            col1, col2, col3, col4 = st.columns(4)
             
             with col1:
                 ocr_engine = st.selectbox(
@@ -145,6 +145,26 @@ def render_upload():
                     help="OCR识别语言",
                 )
             
+            with col3:
+                # 样本页数设置
+                is_pdf = uploaded_file.name.lower().endswith('.pdf')
+                sample_pages = st.number_input(
+                    "处理页数",
+                    min_value=1,
+                    max_value=500,
+                    value=50 if is_pdf else 999,
+                    disabled=not is_pdf,
+                    help="PDF文件建议先处理部分页面，非PDF文件处理全部内容",
+                )
+            
+            with col4:
+                # LLM分析选项
+                use_llm = st.checkbox(
+                    "使用LLM分析",
+                    value=False,
+                    help="使用大模型分析文档结构（需要配置LLM）",
+                )
+            
             # 处理文档
             if st.button("🚀 开始处理", use_container_width=True):
                 with st.spinner("正在处理文档..."):
@@ -152,10 +172,49 @@ def render_upload():
                         router = DocumentRouter(
                             ocr_engine=ocr_engine,
                             ocr_lang=ocr_lang,
+                            use_llm=use_llm,
                         )
-                        chunks = router.process_file(tmp_path)
+                        
+                        # PDF文件传递页码列表
+                        if is_pdf:
+                            pages = list(range(sample_pages))
+                            chunks = router.process_file(tmp_path, pages=pages)
+                        else:
+                            chunks = router.process_file(tmp_path)
                         
                         st.success(f"处理完成! 共 {len(chunks)} 个分块")
+                        
+                        # 显示结构分析结果
+                        if use_llm and chunks:
+                            st.subheader("🧠 LLM结构分析结果")
+                            metadata = chunks[0].metadata
+                            if "structure_analysis" in metadata:
+                                analysis = metadata["structure_analysis"]
+                                
+                                col1, col2, col3 = st.columns(3)
+                                with col1:
+                                    st.metric("识别结构", analysis.get("structure_type", "unknown"))
+                                with col2:
+                                    st.metric("置信度", f"{analysis.get('confidence', 0):.0%}")
+                                with col3:
+                                    st.metric("分析方法", analysis.get("method", "unknown"))
+                                
+                                if analysis.get("description"):
+                                    st.info(f"**描述**: {analysis['description']}")
+                                
+                                if analysis.get("key_sections"):
+                                    st.info(f"**主要章节**: {', '.join(analysis['key_sections'][:5])}")
+                                
+                                if analysis.get("suggested_template"):
+                                    st.info(f"**建议模板**: {analysis['suggested_template']}")
+                                
+                                # 显示LLM原始响应
+                                if analysis.get("llm"):
+                                    with st.expander("LLM原始响应"):
+                                        st.json(analysis["llm"])
+                                
+                                if analysis.get("llm_error"):
+                                    st.warning(f"LLM错误: {analysis['llm_error']}")
                         
                         # 显示结果
                         st.subheader("处理结果")

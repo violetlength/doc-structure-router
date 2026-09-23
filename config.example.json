@@ -17,11 +17,7 @@
   "vector_db": {
     "type": "chromadb",
     "path": "./data/chroma_db",
-    "collection": "documents",
-    "host": "localhost",
-    "port": 5432,
-    "username": "",
-    "password": ""
+    "collection": "documents"
   },
   "analysis": {
     "sample_pages": 50,

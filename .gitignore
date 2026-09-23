@@ -35,3 +35,7 @@ Thumbs.db
 chroma_db/
 _temp_page_*.png
 test_ocr.png
+
+# Config files with secrets
+config.json
+user_config.json
